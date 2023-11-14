@@ -6800,7 +6800,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
     }
 
     function getEndpoints(baseUri, callback) {
-        var version = '2023-11-10T00:54:26Z';
+        var version = '2023-11-14T17:14:41Z';
         var requestUrl = baseUri + '/pcast/endPoints?version=' + version + '&_=' + _.now();
         var xhr = getAndOpenVendorSpecificXmlHttpMethod('GET', requestUrl);
 
@@ -6922,8 +6922,6 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 
         var newStats = [];
         var normalizedStats = normalizeStatsReport(stats);
-        var overrideAudioCodec;
-        var overrideVideoCodec;
         var iteratorDidRun = false;
 
         function convertStats(statsReport) {
@@ -6931,33 +6929,14 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
                 iteratorDidRun = true;
             }
 
-            if (statsReport.type === 'codec') {
-                var codecMatch = statsReport.mimeType.match(/(.+)\/(.+)/);
-
-                if (codecMatch) {
-                    if (codecMatch[1] === 'audio') {
-                        overrideAudioCodec = codecMatch[2];
-                    }
-
-                    if (codecMatch[1] === 'video') {
-                        overrideVideoCodec = codecMatch[2];
-                    }
-
-                    return;
-                }
-            } else {
-                if (statsReport.mediaType !== undefined) {
-                    if (overrideAudioCodec && statsReport.mediaType === 'audio') {
-                        statsReport.codecId = overrideAudioCodec;
-                    }
-
-                    if (overrideVideoCodec && statsReport.mediaType === 'video') {
-                        statsReport.codecId = overrideVideoCodec;
-                    }
-                }
-            }
-
             if (!_.hasIndexOrKey(statsReport, 'ssrc') || !statsReport.ssrc || _.includes(statsReport.id, 'rtcp')) {
+                if (statsReport.mimeType) {
+                    var stat = {
+                        nativeReport: statsReport,
+                    };
+                    newStats.push(stat);
+                }
+
                 return;
             }
 
@@ -7502,7 +7481,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 ], __WEBPACK_AMD_DEFINE_RESULT__ = (function(_, assert, observable, disposable, pcastLoggerFactory, http, applicationActivityDetector, environment, AudioContext, PCastProtocol, PCastEndPoint, ScreenShareExtensionManager, UserMediaProvider, PeerConnectionMonitor, DimensionsChangedMonitor, metricsTransmitterFactory, StreamTelemetry, SessionTelemetry, PeerConnection, StreamWrapper, PhenixLiveStream, PhenixRealTimeStream, streamEnums, BitRateMonitor, phenixRTC, sdpUtil) {
     'use strict';
 
-    var sdkVersion = '2023-11-10T00:54:26Z';
+    var sdkVersion = '2023-11-14T17:14:41Z';
     var accumulateIceCandidatesDuration = 50;
     var roomOrChannelIdRegex = /^(?:room|channel)Id[:](.*)$/;
     var roomOrChannelAliasRegex = /^(?:room|channel)Alias[:](.*)$/;
@@ -16413,7 +16392,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
     var defaultCategory = 'websdk';
     var start = global['__phenixPageLoadTime'] || global['__pageLoadTime'] || _.now();
     var defaultEnvironment = 'production' || false;
-    var sdkVersion = '2023-11-10T00:54:26Z' || false;
+    var sdkVersion = '2023-11-14T17:14:41Z' || false;
     var releaseVersion = '2023.0.11';
 
     function Logger() {
@@ -25507,7 +25486,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
     'use strict';
 
     var start = phenixRTC.global['__phenixPageLoadTime'] || phenixRTC.global['__pageLoadTime'] || _.now();
-    var sdkVersion = '2023-11-10T00:54:26Z' || false;
+    var sdkVersion = '2023-11-14T17:14:41Z' || false;
 
     function StreamTelemetry(sessionId, logger, metricsTransmitter) {
         assert.isStringNotEmpty(sessionId, 'sessionId');
@@ -25833,7 +25812,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
     'use strict';
 
     var start = phenixRTC.global['__phenixPageLoadTime'] || phenixRTC.global['__pageLoadTime'] || _.now();
-    var sdkVersion = '2023-11-10T00:54:26Z' || false;
+    var sdkVersion = '2023-11-14T17:14:41Z' || false;
 
     function SessionTelemetry(logger, metricsTransmitter) {
         this._version = sdkVersion;
