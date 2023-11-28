@@ -6800,7 +6800,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
     }
 
     function getEndpoints(baseUri, callback) {
-        var version = '2023-11-20T20:29:05Z';
+        var version = '2023-11-28T17:29:11Z';
         var requestUrl = baseUri + '/pcast/endPoints?version=' + version + '&_=' + _.now();
         var xhr = getAndOpenVendorSpecificXmlHttpMethod('GET', requestUrl);
 
@@ -6923,6 +6923,8 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
         var newStats = [];
         var normalizedStats = normalizeStatsReport(stats);
         var iteratorDidRun = false;
+        var audioCodecId = '';
+        var videoCodecId = '';
 
         function convertStats(statsReport) {
             if (!iteratorDidRun) {
@@ -6930,8 +6932,18 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
             }
 
             if (!_.hasIndexOrKey(statsReport, 'ssrc') || !statsReport.ssrc || _.includes(statsReport.id, 'rtcp')) {
-                if (getStatsLegacyCodecIdMigration(statsReport)) {
-                    newStats.push({nativeReport: statsReport});
+                if (statsReport.type === 'codec' && statsReport.mimeType !== undefined) {
+                    var codecMatch = statsReport.mimeType.match(/([^/]+)\/(.+)/);
+
+                    if (codecMatch) {
+                        if (codecMatch[1] === 'audio') {
+                            audioCodecId = codecMatch[2];
+                        }
+
+                        if (codecMatch[1] === 'video') {
+                            videoCodecId = codecMatch[2];
+                        }
+                    }
                 }
 
                 return;
@@ -6979,6 +6991,10 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
                     cpuLimitedResolution: useFirstStringValue(statsReport.cpuLimitedResolution, statsReport.googCpuLimitedResolution),
                     avgEncode: parseIntOrUndefined(useFirstStringValue(statsReport.avgEncode, statsReport.avgEncodeMs, statsReport.googAvgEncodeMs), 10)
                 });
+
+                if (videoCodecId !== '') {
+                    stat.nativeReport.codecId = videoCodecId;
+                }
             }
 
             if (statsReport.mediaType === 'audio') {
@@ -6990,6 +7006,10 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
                     totalSamplesDuration: parseFloatOrUndefined(statsReport.totalSamplesDuration),
                     totalAudioEnergy: parseFloatOrUndefined(statsReport.totalAudioEnergy)
                 });
+
+                if (audioCodecId !== '') {
+                    stat.nativeReport.codecId = audioCodecId;
+                }
             }
 
             newStats.push(stat);
@@ -7198,10 +7218,6 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 
     function isInbound(statsReport) {
         return _.includes(statsReport.id, 'recv') || statsReport.type === 'inboundrtp' || statsReport.type === 'inbound-rtp' || statsReport.type === 'kInboundRtp';
-    }
-
-    function getStatsLegacyCodecIdMigration(stats) {
-        return stats.type === 'codec' && stats.mimeType !== undefined;
     }
 
     return PeerConnection;
@@ -7482,7 +7498,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 ], __WEBPACK_AMD_DEFINE_RESULT__ = (function(_, assert, observable, disposable, pcastLoggerFactory, http, applicationActivityDetector, environment, AudioContext, PCastProtocol, PCastEndPoint, ScreenShareExtensionManager, UserMediaProvider, PeerConnectionMonitor, DimensionsChangedMonitor, metricsTransmitterFactory, StreamTelemetry, SessionTelemetry, PeerConnection, StreamWrapper, PhenixLiveStream, PhenixRealTimeStream, streamEnums, BitRateMonitor, phenixRTC, sdpUtil) {
     'use strict';
 
-    var sdkVersion = '2023-11-20T20:29:05Z';
+    var sdkVersion = '2023-11-28T17:29:11Z';
     var accumulateIceCandidatesDuration = 50;
     var roomOrChannelIdRegex = /^(?:room|channel)Id[:](.*)$/;
     var roomOrChannelAliasRegex = /^(?:room|channel)Alias[:](.*)$/;
@@ -16393,7 +16409,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
     var defaultCategory = 'websdk';
     var start = global['__phenixPageLoadTime'] || global['__pageLoadTime'] || _.now();
     var defaultEnvironment = 'production' || false;
-    var sdkVersion = '2023-11-20T20:29:05Z' || false;
+    var sdkVersion = '2023-11-28T17:29:11Z' || false;
     var releaseVersion = '2023.0.12';
 
     function Logger() {
@@ -25487,7 +25503,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
     'use strict';
 
     var start = phenixRTC.global['__phenixPageLoadTime'] || phenixRTC.global['__pageLoadTime'] || _.now();
-    var sdkVersion = '2023-11-20T20:29:05Z' || false;
+    var sdkVersion = '2023-11-28T17:29:11Z' || false;
 
     function StreamTelemetry(sessionId, logger, metricsTransmitter) {
         assert.isStringNotEmpty(sessionId, 'sessionId');
@@ -25813,7 +25829,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
     'use strict';
 
     var start = phenixRTC.global['__phenixPageLoadTime'] || phenixRTC.global['__pageLoadTime'] || _.now();
-    var sdkVersion = '2023-11-20T20:29:05Z' || false;
+    var sdkVersion = '2023-11-28T17:29:11Z' || false;
 
     function SessionTelemetry(logger, metricsTransmitter) {
         this._version = sdkVersion;
